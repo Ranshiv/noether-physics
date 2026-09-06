@@ -182,6 +182,14 @@ def corroborate(fields: ReferenceFields, candidate: Candidate) -> Corroboration:
     agreements: list[str] = []
     disagreements: list[str] = []
 
+    # A reference that names authors, matched against a candidate that lists
+    # none, cannot be corroborated on its strongest signal. Measured: an
+    # entirely invented reference reached 0.80 on year + volume + page alone
+    # because the provider returned no author list, so the veto below never
+    # fired. Not checking is not the same as agreeing, so this caps the score
+    # below the threshold rather than letting weak signals carry the match.
+    unverifiable_authors = bool(fields.surnames) and not candidate.authors
+
     if fields.year and candidate.year:
         if fields.year == candidate.year:
             score += 0.30
@@ -203,8 +211,17 @@ def corroborate(fields: ReferenceFields, candidate: Candidate) -> Corroboration:
             score += 0.15
             agreements.append("an author")
         else:
-            score -= 0.15
-            disagreements.append("no shared author")
+            # A veto, not a penalty. Measured on the labelled set: a -0.15
+            # deduction let a matching title or locator carry a reference whose
+            # named authors appeared nowhere in the candidate -- a real title
+            # attached to an unrelated author scored 0.84 and "resolved".
+            # Two works that share no author are not the same work, whatever
+            # else agrees, so this ends the comparison rather than discounting it.
+            return Corroboration(
+                0.0,
+                agreements,
+                [*disagreements, "no author in common (disqualifying)"],
+            )
 
     if fields.volume and candidate.volume and fields.volume == str(candidate.volume):
         score += 0.20
@@ -232,6 +249,10 @@ def corroborate(fields: ReferenceFields, candidate: Candidate) -> Corroboration:
         if _title_appears_in(candidate.title, fields.raw_text):
             score += 0.35
             agreements.append("title appears in the reference text")
+
+    if unverifiable_authors:
+        score = min(score, MATCH_THRESHOLD - 0.05)
+        disagreements.append("candidate lists no authors, so authorship is unverifiable")
 
     return Corroboration(max(0.0, min(1.0, score)), agreements, disagreements)
 

@@ -264,4 +264,123 @@ def run_citation_gate(library: Any, paper_ids: list[str], threshold: float = 0.8
 
 def status(directory: Path | None = None) -> list[GateResult]:
     """Every gate's last known result, unmeasured ones included."""
-    return [load_result(gate, directory) for gate in ("equations", "retrieval", "citations")]
+    return [
+        load_result(gate, directory)
+        for gate in ("equations", "retrieval", "citations", "resolver")
+    ]
+
+
+# ---- gate 4: resolver precision ----------------------------------------
+
+def reference_benchmark_path() -> Path:
+    return research_dir() / "benchmarks" / "references.yaml"
+
+
+def run_resolver_gate(library: Any, path: Path | None = None) -> GateResult:
+    """Measure what the citations gate cannot: the FALSE-POSITIVE rate.
+
+    The citations gate reports recall — how many real references resolve. A
+    resolver that matched every input to something would score perfectly there
+    and be worse than useless, because it would confirm exactly the fabricated
+    citations this project exists to catch. This gate feeds it references whose
+    truth is known in advance and asks the opposite question.
+
+    Reported value is **1 - false_positive_rate**, so that, like every other
+    gate, higher is better and the threshold reads as a floor.
+
+    Real entries have their identifiers stripped, so resolution goes down the
+    free-text corroboration path rather than a dictionary lookup, and a real
+    entry only counts as recovered when it resolves to the *right* paper.
+    """
+    path = path or reference_benchmark_path()
+    if not path.exists():
+        return GateResult("resolver", False, detail=f"no benchmark at {path}")
+
+    spec = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    entries = spec.get("references", [])
+    if not entries:
+        return GateResult("resolver", False, detail="benchmark is empty")
+
+    thresholds = spec.get("thresholds", {})
+    max_fp = float(thresholds.get("max_false_positive_rate", 0.10))
+    min_tp = float(thresholds.get("min_true_positive_rate", 0.60))
+
+    from .ingest.bibliography import BibEntry, mine_identifiers
+    from .verify.citations import CitationResolver
+
+    resolver = CitationResolver(library.store, library.net)
+
+    real_total = real_resolved = real_correct = 0
+    corrupted_total = corrupted_resolved = 0
+    fake_total = fake_resolved = 0
+    failures: list[dict[str, Any]] = []
+    by_subtype: dict[str, dict[str, int]] = {}
+
+    for entry in entries:
+        text = entry["text"]
+        bib = mine_identifiers(BibEntry(key=entry["id"], raw=text, text=text))
+        resolution = resolver.resolve(bib, use_cache=False)
+
+        if entry["label"] == "real":
+            real_total += 1
+            if not resolution.resolved:
+                failures.append({
+                    "id": entry["id"], "kind": "missed-real",
+                    "detail": resolution.reason[:110],
+                })
+                continue
+            real_resolved += 1
+            # Resolving to *a* paper is not the same as resolving correctly.
+            expected = (entry.get("truth") or {}).get("doi", "").lower()
+            got = str(resolution.payload.get("doi") or "").lower()
+            if expected and got and expected != got:
+                failures.append({
+                    "id": entry["id"], "kind": "wrong-paper",
+                    "detail": f"expected {expected}, resolved to {got}",
+                })
+            else:
+                real_correct += 1
+            continue
+
+        if entry["label"] == "corrupted":
+            # A real paper with one field mistyped. Resolving it is correct
+            # behaviour, not a false positive; the open question is whether the
+            # discrepancy gets flagged. Reported, not scored.
+            corrupted_total += 1
+            corrupted_resolved += int(resolution.resolved)
+            continue
+
+        # Fabricated: resolving at all is the failure.
+        subtype = entry.get("subtype", "unknown")
+        counts = by_subtype.setdefault(subtype, {"total": 0, "false_positives": 0})
+        counts["total"] += 1
+        fake_total += 1
+        if resolution.resolved:
+            fake_resolved += 1
+            counts["false_positives"] += 1
+            failures.append({
+                "id": entry["id"], "kind": "FALSE POSITIVE", "subtype": subtype,
+                "detail": f"confidence {resolution.confidence:.2f} via {resolution.source} "
+                          f"-> {str(resolution.title)[:60]}",
+            })
+
+    false_positive_rate = fake_resolved / fake_total if fake_total else 0.0
+    true_positive_rate = real_correct / real_total if real_total else 0.0
+
+    return GateResult(
+        gate="resolver",
+        measured=True,
+        value=1.0 - false_positive_rate,
+        threshold=1.0 - max_fp,
+        total=fake_total,
+        passed=fake_total - fake_resolved,
+        failures=failures,
+        detail=(
+            f"false positives {fake_resolved}/{fake_total} "
+            f"({false_positive_rate:.0%}); real recovered {real_correct}/{real_total} "
+            f"({true_positive_rate:.0%}, floor {min_tp:.0%}); "
+            f"corrupted recovered {corrupted_resolved}/{corrupted_total}; "
+            + ", ".join(f"{k} {v['false_positives']}/{v['total']}" for k, v in sorted(by_subtype.items()))
+        ),
+        measured_at=datetime.now(UTC).isoformat(timespec="seconds"),
+    )

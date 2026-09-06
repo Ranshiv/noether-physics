@@ -28,9 +28,11 @@ so the gate let it through. Closing that gap needs entailment checking, which ne
 model, and keeping the model outside the verifier is what makes the other guarantees meaningful. So
 every answer this tool emits ends by saying so, and **you should read the quotes.**
 
-**The reference resolver's false-positive rate is unmeasured.** It finds 86.5% of real references.
-Nobody knows how often it would confidently match a *fabricated* one. For a tool whose first
-promise concerns hallucinated citations, that is the most important number that does not yet exist.
+**The reference resolver is now measured in both directions.** It resolves 86.5% of real references
+and was fooled by **0 of 8** deliberately fabricated ones. That second number did not exist until a
+labelled benchmark was built for it — and the first run of that benchmark caught the resolver
+confirming **80%** of fabrications, some at 0.95 confidence. Three defects were found and fixed. Eight
+fabrications is still a small sample: 0% means "fooled by none of eight", not "cannot be fooled".
 
 **It is small.** 58 papers in the test corpus, 8 concepts in the explanation library, quantum
 coverage limited to two-level systems and one cavity mode. No PDF fallback, so roughly 9% of
@@ -104,6 +106,7 @@ Run `noether bench status` yourself. As of the last run:
 | equations | 100% (31/31) | 90% | pass |
 | retrieval | 83.3% (10/12) **at top-3 of 58 papers** | 80% | pass |
 | citations | 86.5% (32/37) | 85% | pass |
+| resolver | 0% false positives (0/8 fabrications) | ≤10% | pass |
 
 Read these with their scope attached. "Right paper in the top 3" over 58 papers is a real task; over
 8 it was nearly free, and an earlier run reported a meaningless 100% because `top_k` exceeded the

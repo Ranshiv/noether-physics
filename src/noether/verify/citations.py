@@ -180,26 +180,37 @@ class CitationResolver:
                 reason="reference states neither a year nor a recognisable author",
             )
 
-        # A journal coordinate is an exact lookup, so try it first. It answers
-        # the case general bibliographic search cannot: a reference that states
-        # journal, volume and page but no title.
+        # A journal coordinate is a strong lead, so try it first -- it answers
+        # the case general search cannot: a reference stating journal, volume
+        # and page but no title.
+        #
+        # It is NOT proof. An earlier version returned the first hit at 0.95
+        # confidence without checking anything, and the labelled benchmark
+        # measured the result: an 80% false-positive rate. A reference with the
+        # year wrong by six years still "resolved" to the real paper at 0.95,
+        # and so did one carrying an entirely unrelated author. A lookup that
+        # finds something is not a lookup that found the right thing, so the
+        # candidate goes through the same corroboration as every other route.
         if fields.journal and fields.volume and fields.page:
             try:
                 hits = self.inspire.search_journal(fields.journal, fields.volume, fields.page)
             except Exception:
                 hits = []
-            if hits:
-                candidate = from_inspire(hits[0])
+            corroboration, candidate = best_candidate(fields, [from_inspire(h) for h in hits])
+            if candidate is not None and corroboration.score >= MATCH_THRESHOLD:
                 return Resolution(
                     identifier=identifier,
                     kind="text",
                     resolved=True,
                     source="inspire",
                     title=candidate.title,
-                    confidence=0.95,
+                    # Bounded below 1.0: the coordinate raises confidence but
+                    # never removes the possibility of a wrong match.
+                    confidence=min(0.95, 0.60 + corroboration.score * 0.35),
                     payload={"doi": candidate.doi,
                              "matched_by": f"journal coordinate {fields.journal},"
-                                           f"{fields.volume},{fields.page}"},
+                                           f"{fields.volume},{fields.page}",
+                             "corroboration": corroboration.explain()},
                 )
 
         attempts = (

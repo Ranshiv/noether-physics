@@ -1,0 +1,12 @@
+{
+  "detail": "false positives 0/8 (0%); real recovered 10/10 (100%, floor 60%); corrupted recovered 2/2; frankenstein 0/2, invented 0/3, nonexistent-journal 0/1, wrong-year 0/2",
+  "failures": [],
+  "gate": "resolver",
+  "measured": true,
+  "measured_at": "2026-09-06T22:48:15+00:00",
+  "noether_version": "0.1.1",
+  "passed": 8,
+  "threshold": 0.9,
+  "total": 8,
+  "value": 1.0
+}

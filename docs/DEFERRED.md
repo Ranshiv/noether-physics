@@ -16,6 +16,7 @@ Run `noether bench status` for the current numbers. As of the last run:
 | equations | 100% (31/31) | 90% | PASS |
 | retrieval | 83.3% (10/12) at top-3 of **58** papers | 80% | PASS |
 | citations | 86.5% (32/37) | 85% | PASS — measured on ONE paper, before the corpus grew |
+| resolver | 0% false positives (0/8 fabrications) | ≤10% | PASS |
 
 - `[DONE]` **Corpus grown to 58 papers** (quant-ph: decoherence, transmons, cavity QED, error
   correction). Retrieval re-measured at that scale fell from 91.7% to **83.3%** — the drop is the
@@ -126,10 +127,36 @@ Measured against arXiv:2001.11966 (nEDM, PRL 124 081803), which forced five desi
   search: it is an exact lookup on precisely the fields a physics reference states.
 - `[KNOWN]` The 0.70 threshold and the individual weights were chosen by reasoning, then sanity-checked
   on one paper's 37 references. They are **not tuned against labelled data.**
-- `[GAP]` No labelled dataset of known-good and known-bad references, so the resolver's
-  **false-positive rate is unmeasured**. We know it finds 86.5% of real references; we do not know how
-  often it would confidently match a fabricated one. For a tool whose first guarantee is about
-  hallucinated citations, that is the most important missing measurement in the project.
+- `[DONE]` **The false-positive rate is now measured.** `research/benchmarks/references.yaml` holds
+  20 labelled references — 10 real with identifiers stripped (forcing the free-text path and checking
+  they resolve to the *right* paper), 8 fabricated across four subtypes, 2 corrupted. Gate:
+  `noether bench resolver`.
+
+  **First run: 80% of fabrications resolved**, several at 0.95 confidence. Three defects, each fixed
+  and each pinned by a test:
+
+  1. *The journal-coordinate lookup bypassed verification entirely* — it returned the first INSPIRE
+     hit at 0.95 with no corroboration, so a reference with the year wrong by six still matched the
+     real paper. Now corroborated like every other route. **80% → 40%.**
+  2. *Author mismatch was a −0.15 penalty, not a veto* — a real title attached to an unrelated author
+     scored 0.84 and resolved. Two works sharing no author are not the same work. **40% → 30%.**
+  3. *A candidate listing no authors skipped the check* — an invented reference reached 0.80 on
+     year + volume + page alone. Unverifiable authorship now caps the score below threshold, because
+     not checking is not agreeing.
+
+  Final: **0/8 fabrications resolved, 10/10 real references resolved to the correct paper.** Real
+  recall never dropped while precision was fixed.
+
+- `[KNOWN]` **The benchmark itself taught a lesson worth recording.** The first `invented` entry used
+  the surname "Marchetti" and resolved at 0.80 — *correctly*, because M. Cristina Marchetti really
+  did publish in Phys. Rev. A 94 in 2016. The fabrication accidentally described a real paper.
+  Writing convincing fakes is harder than it looks: a plausible surname is plausible precisely
+  because somebody already has it.
+- `[KNOWN]` **8 fabrications is a small sample.** 0% means "fooled by none of eight", not "cannot be
+  fooled". The subtypes are hand-built and reflect one person's model of how citations get faked.
+- `[GAP]` A `corrupted` reference (real paper, mistyped page or volume) resolves to the right paper —
+  which is correct — but the discrepancy is **not reported**. It should be, so an author can fix the
+  typo instead of unknowingly shipping it.
 
 ## Phase 4 — answering
 

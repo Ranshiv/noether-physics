@@ -1,0 +1,176 @@
+# Labelled reference set — acceptance gate 4 (resolver precision)
+#
+# WHY THIS EXISTS
+#
+# The citations gate measures RECALL: 86.5% of real references resolve. It says
+# nothing about the opposite direction — what the resolver does with a reference
+# that does not exist. A resolver that matched everything to something would
+# score perfect recall and be actively dangerous: it would rubber-stamp exactly
+# the hallucinated citations this project exists to catch.
+#
+# So this set contains references whose truth is known in advance, and the gate
+# measures the number that was missing: the FALSE-POSITIVE RATE.
+#
+# ============================================================================
+# THE `fabricated` ENTRIES BELOW ARE SYNTHETIC AND DELIBERATELY FALSE.
+# They are test fixtures. They describe papers that do not exist, or attach
+# real components to each other in wrong combinations. Nothing here should be
+# cited, quoted, or treated as a bibliography. They exist so the resolver can
+# be measured against them.
+# ============================================================================
+#
+# DESIGN
+#
+# Real entries have their DOI/arXiv id STRIPPED from the text and kept in
+# `truth` instead. That forces the resolver down the free-text corroboration
+# path — the hard one, and the one fabrications would also take — and lets the
+# gate check not merely "did it resolve" but "did it resolve to the RIGHT
+# paper". Leaving the DOI in the text would test a dictionary lookup.
+#
+# Fabrications mirror how LLMs actually hallucinate citations. The 2026 audits
+# describe the dominant pattern as correct-looking titles carrying invented
+# metadata, so the subtypes below are graded by how much genuine material they
+# contain — `invented` is wholly false, `wrong-locator` is a real paper with one
+# corrupted field. A resolver can fail at either end for different reasons.
+
+thresholds:
+  # A single confidently-resolved fabrication is a serious defect, but demanding
+  # zero on a 20-item sample would over-claim from too little data. 0.10 is a
+  # starting line to beat, not a statement that 10% is acceptable.
+  max_false_positive_rate: 0.10
+  # Recall on stripped identifiers is harder than the 86.5% citations gate,
+  # which allowed the DOI shortcut. Set below it deliberately.
+  min_true_positive_rate: 0.60
+
+references:
+
+  # ---- REAL — identifier stripped, kept as ground truth -------------------
+
+  - id: real-01
+    label: real
+    text: "F. Benatti, R. Floreanini, Int. J. Mod. Phys. B 19, 3063 (2005)."
+    truth: { doi: "10.1142/S0217979205032097" }
+
+  - id: real-02
+    label: real
+    text: "F.M. Cucchietti, J.P. Paz, W.H. Zurek, Phys. Rev. A 72, 052113 (2005)."
+    truth: { doi: "10.1103/PhysRevA.72.052113" }
+
+  - id: real-03
+    label: real
+    text: "V.V. Dobrovitski, H.A. De Raedt, M.I. Katsnelson, B.N. Harmon, Phys. Rev. Lett. 90, 210401 (2003)."
+    truth: { doi: "10.1103/PhysRevLett.90.210401" }
+
+  - id: real-04
+    label: real
+    text: "M. Schlosshauer, Phys. Rep. 831, 1 (2019)."
+    truth: { doi: "10.1016/j.physrep.2019.10.001" }
+
+  - id: real-05
+    label: real
+    text: "W.H. Zurek, Phys. Rev. D 26, 1862 (1982)."
+    truth: { doi: "10.1103/PhysRevD.26.1862" }
+
+  - id: real-06
+    label: real
+    text: "W.H. Zurek, Rev. Mod. Phys. 75, 715 (2003)."
+    truth: { doi: "10.1103/RevModPhys.75.715" }
+
+  - id: real-07
+    label: real
+    text: "C. Abel et al., Phys. Rev. Lett. 124, 081803 (2020)."
+    truth: { doi: "10.1103/PhysRevLett.124.081803" }
+
+  - id: real-08
+    label: real
+    text: "J. Koch, T.M. Yu, J. Gambetta, A.A. Houck, D.I. Schuster, J. Majer, A. Blais, M.H. Devoret, S.M. Girvin, R.J. Schoelkopf, Phys. Rev. A 76, 042319 (2007)."
+    truth: { doi: "10.1103/PhysRevA.76.042319" }
+
+  - id: real-09
+    label: real
+    text: "A. Wallraff, D.I. Schuster, A. Blais, L. Frunzio, R.-S. Huang, J. Majer, S. Kumar, S.M. Girvin, R.J. Schoelkopf, Nature 431, 162 (2004)."
+    truth: { doi: "10.1038/nature02851" }
+
+  - id: real-10
+    label: real
+    text: "E.T. Jaynes, F.W. Cummings, Proc. IEEE 51, 89 (1963)."
+    truth: { doi: "10.1109/PROC.1963.1664" }
+
+  # ---- CORRUPTED — real papers, one field mistyped ------------------------
+  #
+  # Reclassified after the first benchmark run. These were originally labelled
+  # `fabricated`, and the resolver "failed" them by matching the real paper. On
+  # inspection that is the RIGHT answer: a librarian given "Koch, PRA 76,
+  # 998877" says "you mistyped the page, you mean 042319". Resolving them is
+  # correct; silently confirming them is not. They are scored separately, and
+  # the resolver should ideally report the locator discrepancy — it does not
+  # yet, which is recorded as a gap rather than counted as a false positive.
+
+  # ---- FABRICATED — synthetic, describe nothing real ----------------------
+
+  - id: fake-invented-01
+    label: fabricated
+    subtype: invented
+    text: "Q. Thelwall, B. Krastovic, Phys. Rev. A 94, 042118 (2016)."
+    note: |
+      Surnames chosen to be absent from the physics literature.
+      The first draft of this entry used "Marchetti" and it resolved at 0.80 —
+      correctly. M. Cristina Marchetti is a real physicist who published in
+      Phys. Rev. A 94 in 2016, so the "fabrication" accidentally described a
+      real paper and the resolver was right to match it. Writing convincing
+      fakes is harder than it looks: a plausible surname is plausible precisely
+      because someone already has it.
+
+  - id: fake-invented-02
+    label: fabricated
+    subtype: invented
+    text: "R. Vasquez, T. Lindqvist, D. Oyelaran, Topological protection of driven qubit ensembles, Phys. Rev. Lett. 118, 190502 (2017)."
+    note: "Plausible title in a real journal; the paper does not exist."
+
+  - id: fake-invented-03
+    label: fabricated
+    subtype: invented
+    text: "S. Nakagawa, Coherence revival in structured photonic baths, Nat. Phys. 15, 442 (2019)."
+    note: "The classic phantom: real-sounding title, real journal, no such paper."
+
+  - id: fake-frankenstein-01
+    label: fabricated
+    subtype: frankenstein
+    text: "W.H. Zurek, Charge-insensitive qubit design derived from the Cooper pair box, Phys. Rev. A 76, 042319 (2007)."
+    note: "Real title (Koch et al. 2007) attached to a real but unrelated author. Every component is genuine; the combination is not."
+
+  - id: fake-frankenstein-02
+    label: fabricated
+    subtype: frankenstein
+    text: "E.T. Jaynes, F.W. Cummings, Decoherence and the transition from quantum to classical, Rev. Mod. Phys. 75, 715 (2003)."
+    note: "Real Zurek 2003 title and locator, real Jaynes-Cummings authors, wrong pairing."
+
+  - id: fake-wrong-year-01
+    label: fabricated
+    subtype: wrong-year
+    text: "W.H. Zurek, Phys. Rev. D 26, 1862 (1991)."
+    note: "Real paper (1982), year shifted by nine. Tests whether year corroboration actually bites."
+
+  - id: fake-wrong-year-02
+    label: fabricated
+    subtype: wrong-year
+    text: "C. Abel et al., Phys. Rev. Lett. 124, 081803 (2014)."
+    note: "Real nEDM letter (2020), year shifted by six."
+
+  - id: corrupt-locator-01
+    label: corrupted
+    subtype: wrong-locator
+    text: "J. Koch et al., Phys. Rev. A 76, 998877 (2007)."
+    note: "Real paper, real authors, page number that does not exist. Tests the journal-coordinate lookup."
+
+  - id: corrupt-locator-02
+    label: corrupted
+    subtype: wrong-locator
+    text: "A. Wallraff et al., Nature 999, 162 (2004)."
+    note: "Real paper, impossible volume."
+
+  - id: fake-nonexistent-journal-01
+    label: fabricated
+    subtype: nonexistent-journal
+    text: "M. Schlosshauer, Journal of Applied Decoherence Studies 14, 220 (2019)."
+    note: "Real author, real year, journal that does not exist."

@@ -78,9 +78,29 @@ class TestCorroboration:
         result = corroborate(self.FIELDS, Candidate(year=2019, authors=["C. Abel"]))
         assert "year within 1" in result.agreements
 
-    def test_no_shared_author_is_penalised(self) -> None:
+    def test_no_shared_author_is_disqualifying(self) -> None:
+        """A veto, not a penalty — measured on the labelled reference set.
+
+        With a -0.15 deduction, a real title attached to an unrelated author
+        scored 0.84 and resolved. Two works sharing no author are not the same
+        work, whatever else agrees.
+        """
         result = corroborate(self.FIELDS, Candidate(year=2020, authors=["Q. Different"]))
-        assert "no shared author" in result.disagreements
+        assert result.score == 0.0
+        assert "no author in common (disqualifying)" in result.disagreements
+
+    def test_author_veto_survives_a_perfect_title_match(self) -> None:
+        """The exact failure the benchmark caught: right title, wrong author."""
+        fields = extract_fields(
+            "W.H. Zurek, Charge-insensitive qubit design, Phys. Rev. A 76, 042319 (2007).",
+            known_title="Charge-insensitive qubit design",
+        )
+        result = corroborate(
+            fields,
+            Candidate(title="Charge-insensitive qubit design", year=2007,
+                      authors=["J. Koch", "T. M. Yu"], volume="76", page="042319"),
+        )
+        assert result.score == 0.0
 
     def test_volume_and_page_compound(self) -> None:
         base = Candidate(year=2020, authors=["C. Abel"])

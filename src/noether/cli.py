@@ -451,6 +451,23 @@ def bench_citations(
     library.close()
 
 
+@bench_app.command("resolver")
+def bench_resolver() -> None:
+    """Measure the resolver's FALSE-POSITIVE rate against fabricated references.
+
+    The citations gate measures recall. This measures whether the resolver can
+    be fooled — the number that actually backs this project's central promise.
+    Hits the network; expect it to be slow.
+    """
+    library = Library()
+    result = benchmarks.run_resolver_gate(library)
+    _render_gate(result)
+    if result.measured:
+        console.print(f"[dim]{result.detail}[/dim]")
+        console.print(f"[dim]saved: {result.save()}[/dim]")
+    library.close()
+
+
 @bench_app.command("status")
 def bench_status() -> None:
     """Show every gate's last result. Unmeasured gates say so."""
