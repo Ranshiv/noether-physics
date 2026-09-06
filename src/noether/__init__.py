@@ -8,4 +8,4 @@ Four guarantees hold across every code path that emits an answer:
 4. Every session is reproducible from a content-hashed record.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"

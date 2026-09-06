@@ -3,7 +3,7 @@
 # library, so the distribution is noether-physics; the import package and the
 # console script both remain "noether".
 name = "noether-physics"
-version = "0.1.0"
+version = "0.1.1"
 description = "Physics research assistant: explains concepts with checked equations and live simulations, and verifies claims against real arXiv papers."
 readme = "README.md"
 requires-python = ">=3.12"

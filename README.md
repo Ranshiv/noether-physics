@@ -1,6 +1,6 @@
 # NOETHER
 
-<!-- mcp-name: io.github.ranshiv/noether-physics -->
+<!-- mcp-name: io.github.Ranshiv/noether-physics -->
 
 **A physics research assistant that shows its work.**
 
@@ -131,7 +131,7 @@ pip install "noether-physics[mcp]"       # + MCP server
 ```
 
 Python 3.12+. From source: `uv venv && uv pip install -e ".[dev,quantum,mcp]"`, then `uv run pytest`
-(285 tests, no network — cassettes default to replay and a miss is an error, not a live fallback).
+(287 tests, no network — cassettes default to replay and a miss is an error, not a live fallback).
 
 ## Terms
 
