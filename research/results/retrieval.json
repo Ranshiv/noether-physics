@@ -1,0 +1,31 @@
+{
+  "detail": "top-3 of 58 papers",
+  "failures": [
+    {
+      "expected": "arXiv:2101.07336",
+      "got": [
+        "arXiv:1903.12498",
+        "arXiv:quant-ph/0401092",
+        "arXiv:quant-ph/0511051"
+      ],
+      "question": "How does a two-level system exchange a single excitation with a cavity field, and what does that do to teleportation fidelity?"
+    },
+    {
+      "expected": "arXiv:2005.11755",
+      "got": [
+        "arXiv:1404.2635",
+        "arXiv:2207.09470",
+        "arXiv:2402.19241"
+      ],
+      "question": "When does the standard weak-coupling open-system approximation fail to describe energy flow correctly?"
+    }
+  ],
+  "gate": "retrieval",
+  "measured": true,
+  "measured_at": "2026-09-06T21:15:56+00:00",
+  "noether_version": "0.1.0",
+  "passed": 10,
+  "threshold": 0.8,
+  "total": 12,
+  "value": 0.8333333333333334
+}

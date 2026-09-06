@@ -1,0 +1,84 @@
+[project]
+# PyPI distribution name. "noether" is taken by an unrelated physical-units
+# library, so the distribution is noether-physics; the import package and the
+# console script both remain "noether".
+name = "noether-physics"
+version = "0.1.0"
+description = "Physics research assistant: explains concepts with checked equations and live simulations, and verifies claims against real arXiv papers."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Ranshiv Kumar", email = "ranshiv369@gmail.com" }]
+keywords = [
+    "physics", "quantum", "arxiv", "mcp", "research",
+    "citations", "simulation", "latex", "sympy", "qutip",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Text Processing :: Markup :: LaTeX",
+]
+
+dependencies = [
+    "httpx>=0.27",
+    "typer>=0.12",
+    "rich>=13.7",
+    "platformdirs>=4.2",
+    "pyyaml>=6.0",
+    "pylatexenc>=2.10",
+    "sympy>=1.13",
+    "pint>=0.24",
+    "numpy>=1.26",
+    "scipy>=1.13",
+    "matplotlib>=3.9",
+]
+
+[project.optional-dependencies]
+quantum = ["qutip>=5.0", "qiskit>=1.2"]
+mcp = ["mcp>=1.2"]
+dev = ["pytest>=8.2", "pytest-asyncio>=0.23", "ruff>=0.6", "mypy>=1.11"]
+
+[project.urls]
+Homepage = "https://github.com/Ranshiv/noether-physics"
+Repository = "https://github.com/Ranshiv/noether-physics"
+Issues = "https://github.com/Ranshiv/noether-physics/issues"
+"Honest status" = "https://github.com/Ranshiv/noether-physics/blob/main/docs/DEFERRED.md"
+
+[project.scripts]
+noether = "noether.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/noether"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "live: hits the real network; skipped unless NOETHER_LIVE=1",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# B008: typer.Argument()/Option() in a default IS the Typer idiom; the
+#       alternative is worse code to satisfy a rule aimed at mutable defaults.
+# BLE001/S112: deliberate. pylatexenc raises many types on malformed input and a
+#       provider outage must not abort an audit; both sites say so in a comment.
+# RUF012: a frozen-by-convention dict of test fixtures.
+# ISC004: long explanatory prose is written as adjacent string literals inside
+#         lists throughout the concept library and simulation caveats. That is
+#         the readable form for paragraphs; parenthesising each one adds noise.
+ignore = ["B008", "BLE001", "S112", "RUF012", "ISC004"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true

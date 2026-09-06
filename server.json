@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.ranshiv/noether-physics",
+  "description": "Physics research assistant: explains concepts with checked equations and live simulations, and verifies claims against real arXiv papers.",
+  "repository": {
+    "url": "https://github.com/Ranshiv/noether-physics",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "noether-physics",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

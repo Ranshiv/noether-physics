@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <title type="html">ArXiv Query</title>
+  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">2</opensearch:totalResults>
+  <entry>
+    <id>http://arxiv.org/abs/2001.11966v1</id>
+    <updated>2020-01-31T14:04:55Z</updated>
+    <published>2020-01-31T14:04:55Z</published>
+    <title>Measurement of the permanent electric dipole moment of the neutron</title>
+    <summary>  We present the result of an experiment to measure the electric dipole
+  moment of the neutron.
+</summary>
+    <author><name>C. Abel</name></author>
+    <author><name>S. Afach</name></author>
+    <author><name>N. J. Ayres</name></author>
+    <author><name>C. A. Baker</name></author>
+    <arxiv:doi>10.1103/PhysRevLett.124.081803</arxiv:doi>
+    <arxiv:journal_ref>Phys. Rev. Lett. 124, 081803 (2020)</arxiv:journal_ref>
+    <arxiv:comment>8 pages, 4 figures</arxiv:comment>
+    <link href="http://arxiv.org/abs/2001.11966v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/2001.11966v1" rel="related" type="application/pdf"/>
+    <rights>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</rights>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="hep-ex"/>
+    <category term="hep-ex" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nucl-ex" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/hep-th/9901001v2</id>
+    <updated>1999-01-04T09:00:00Z</updated>
+    <published>1999-01-01T09:00:00Z</published>
+    <title>An older paper using the pre-2007 identifier scheme</title>
+    <summary>  Abstract text wrapped
+  across lines.
+</summary>
+    <author><name>A. Physicist</name></author>
+    <link href="http://arxiv.org/abs/hep-th/9901001v2" rel="alternate" type="text/html"/>
+    <rights>http://creativecommons.org/licenses/by/4.0/</rights>
+    <category term="hep-th" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>

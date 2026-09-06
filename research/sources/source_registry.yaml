@@ -1,0 +1,74 @@
+# Every external data source, its terms, and when we last verified them.
+#
+# A source that is not in this file must not be called. The verified_on date is
+# the last time a human confirmed the base URL, rate limit and terms by reading
+# the provider's own documentation -- not the last time a request succeeded.
+
+sources:
+  arxiv:
+    name: arXiv
+    base_url: https://export.arxiv.org/api/query
+    eprint_url: https://export.arxiv.org/e-print/
+    docs: https://info.arxiv.org/help/api/index.html
+    terms: https://info.arxiv.org/help/api/tou.html
+    # arXiv's documented ask for automated clients. Bulk crawling is forbidden;
+    # the S3 bulk mirror is requester-pays and out of scope for this tool.
+    min_interval_s: 3.0
+    auth: none
+    provides: [metadata, latex_source, figures, license]
+    status: contract-unverified
+    verified_on: null
+
+  inspire:
+    name: INSPIRE-HEP
+    base_url: https://inspirehep.net/api
+    docs: https://github.com/inspirehep/rest-api-doc
+    min_interval_s: 1.0
+    auth: none
+    provides: [metadata, citations, references, fulltext_search]
+    status: contract-unverified
+    verified_on: null
+
+  crossref:
+    name: Crossref
+    base_url: https://api.crossref.org
+    docs: https://api.crossref.org/swagger-ui/index.html
+    min_interval_s: 1.0
+    auth: none
+    # Sending a mailto puts us in the faster, more reliable "polite" pool.
+    polite_pool: mailto
+    provides: [doi_resolution, metadata]
+    status: contract-unverified
+    verified_on: null
+
+  openalex:
+    name: OpenAlex
+    base_url: https://api.openalex.org
+    docs: https://docs.openalex.org
+    min_interval_s: 0.2
+    auth: none
+    polite_pool: mailto
+    provides: [metadata, citations, references, concepts]
+    status: contract-unverified
+    verified_on: null
+
+  semanticscholar:
+    name: Semantic Scholar Graph API
+    base_url: https://api.semanticscholar.org/graph/v1
+    docs: https://api.semanticscholar.org/api-docs/graph
+    min_interval_s: 1.0
+    # Unauthenticated access is heavily throttled; a free key raises the limit.
+    auth: optional_api_key
+    provides: [metadata, citations, references, embeddings]
+    status: contract-unverified
+    verified_on: null
+
+  pdg:
+    name: Particle Data Group
+    base_url: https://pdgapi.lbl.gov/
+    docs: https://pdgapi.lbl.gov/doc
+    min_interval_s: 1.0
+    auth: none
+    provides: [particle_properties, measurements, limits]
+    status: contract-unverified
+    verified_on: null

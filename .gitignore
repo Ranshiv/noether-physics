@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Local data root, if the user points it inside the repo
+.noether/
+*.sqlite
+*.sqlite-*
+*.duckdb
+
+# Bulk artefacts stay outside the repo, referenced by manifest + checksum
+research/**/*.parquet
+research/**/*.pdf
+research/**/*.tar.gz
+!research/**/.gitkeep
+
+# Small tabular artefacts ARE tracked (see research/README.md size policy)
+!research/labels/*.json
+!research/results/*.json
+!research/benchmarks/*.yaml

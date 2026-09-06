@@ -1,0 +1,38 @@
+{
+  "detail": "",
+  "failures": [
+    {
+      "detail": "best corroboration 0.60 (agrees on year, first author), below 0.70",
+      "key": "AbelPRA2019",
+      "paper_id": "arXiv:2001.11966"
+    },
+    {
+      "detail": "best corroboration 0.60 (agrees on year, first author), below 0.70",
+      "key": "Abragam",
+      "paper_id": "arXiv:2001.11966"
+    },
+    {
+      "detail": "no provider corroborated above 0.70",
+      "key": "Luders1954",
+      "paper_id": "arXiv:2001.11966"
+    },
+    {
+      "detail": "best corroboration 0.45 (agrees on year within 1, first author), below 0.70",
+      "key": "Pauli1955",
+      "paper_id": "arXiv:2001.11966"
+    },
+    {
+      "detail": "best corroboration 0.60 (agrees on year, first author), below 0.70",
+      "key": "Pignol2015",
+      "paper_id": "arXiv:2001.11966"
+    }
+  ],
+  "gate": "citations",
+  "measured": true,
+  "measured_at": "2026-09-05T17:04:54+00:00",
+  "noether_version": "0.1.0",
+  "passed": 32,
+  "threshold": 0.85,
+  "total": 37,
+  "value": 0.8648648648648649
+}

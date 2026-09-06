@@ -1,0 +1,149 @@
+# Equation benchmark -- acceptance gate 2.
+#
+# Each case states what SHOULD happen. A deliberately wrong equation we report as
+# consistent is a failure exactly as a correct one we report as inconsistent is;
+# both directions are scored, because a checker that never says "inconsistent"
+# would score perfectly on correct physics alone and be worthless.
+#
+# `dimensions` expects one of: consistent | inconsistent | unknown.
+# `unknown` is a real expected outcome: for an ambiguous undeclared symbol, "we
+# did not check" is the correct answer, not a guess.
+
+threshold: 0.90
+
+equations:
+  # --- textbook relations, declared units, should be consistent -----------
+  - latex: "E = m c^2"
+    units: {E: joule, m: kilogram}
+    parses: true
+    dimensions: consistent
+
+  - latex: "\\lambda = \\frac{h}{p}"
+    units: {lambda: meter, h: joule*second, p: kilogram*meter/second}
+    parses: true
+    dimensions: consistent
+
+  - latex: "F = G \\frac{m_1 m_2}{r^2}"
+    units: {F: newton, G: meter**3/(kilogram*second**2), m: kilogram, r: meter}
+    parses: true
+    dimensions: consistent
+
+  - latex: "T = 2 \\pi \\sqrt{\\frac{L}{g}}"
+    units: {T: second, L: meter, g: meter/second**2}
+    parses: true
+    dimensions: consistent
+
+  - latex: "E = \\frac{1}{2} m v^2 + m g h"
+    units: {E: joule, m: kilogram, v: meter/second, g: meter/second**2, h: meter}
+    parses: true
+    dimensions: consistent
+
+  - latex: "E_n = \\frac{n^2 \\pi^2 \\hbar^2}{2 m L^2}"
+    units: {E: joule, m: kilogram, L: meter}
+    parses: true
+    dimensions: consistent
+
+  - latex: "E = \\hbar \\omega"
+    units: {E: joule, omega: radian/second}
+    parses: true
+    dimensions: consistent
+
+  - latex: "p = \\rho v^2"
+    units: {p: pascal, rho: kilogram/meter**3, v: meter/second}
+    parses: true
+    dimensions: consistent
+
+  - latex: "v = f \\lambda"
+    units: {v: meter/second, f: hertz, lambda: meter}
+    parses: true
+    dimensions: consistent
+
+  - latex: "P = I V"
+    units: {P: watt, I: ampere, V: volt}
+    parses: true
+    dimensions: consistent
+
+  # --- deliberately wrong: the checker must catch these ------------------
+  - latex: "E = m c"
+    units: {E: joule, m: kilogram, c: meter/second}
+    parses: true
+    dimensions: inconsistent
+
+  - latex: "x = t + m"
+    units: {x: meter, t: second, m: kilogram}
+    parses: true
+    dimensions: inconsistent
+
+  - latex: "E = \\frac{1}{2} m v + m g h"
+    units: {E: joule, m: kilogram, v: meter/second, g: meter/second**2, h: meter}
+    parses: true
+    dimensions: inconsistent
+
+  - latex: "F = m a^2"
+    units: {F: newton, m: kilogram, a: meter/second**2}
+    parses: true
+    dimensions: inconsistent
+
+  - latex: "\\lambda = h p"
+    units: {lambda: meter, h: joule*second, p: kilogram*meter/second}
+    parses: true
+    dimensions: inconsistent
+
+  # --- ambiguous and undeclared: "unknown" is the correct answer ---------
+  - latex: "E = \\frac{1}{2} m v^2 + m g h"
+    parses: true
+    dimensions: unknown
+
+  - latex: "\\Psi = \\Xi \\zeta"
+    parses: true
+    dimensions: unknown
+
+  # --- notation that must survive normalisation -------------------------
+  - latex: "\\Omega = 2 g \\sqrt{n+1}"
+    parses: true
+
+  - latex: "H = \\hbar \\omega (a^\\dagger a + \\frac{1}{2})"
+    parses: true
+
+  - latex: "f_{{\\rm n}} = \\frac{1}{\\pi \\hbar} \\left| \\mu_{{\\rm n}} B \\right|"
+    parses: true
+
+  - latex: "\\frac{d^2 x}{d t^2} = -\\omega^2 x"
+    parses: true
+
+  - latex: "\\Delta x \\Delta p \\geq \\frac{\\hbar}{2}"
+    parses: true
+
+  - latex: "\\sigma = \\frac{\\hbar}{2} \\tanh\\left(\\frac{\\beta}{2}\\right)"
+    parses: true
+
+  # --- structurally unrepresentable: must FAIL, not parse into nonsense --
+  # Stripping \begin leaves "{bmatrix}", which the grammar reads as
+  # b*m*a*t*r*i*x -- a clean parse of a meaningless product.
+  - latex: "\\begin{bmatrix} 1 & 2 \\end{bmatrix}"
+    parses: false
+
+  - latex: "\\begin{cases} x & x > 0 \\\\ 0 & x \\leq 0 \\end{cases}"
+    parses: false
+  # --- Greek letters the grammar rejects natively ------------------------
+  # sigma, varsigma and iota are rejected despite being lowercase Greek, and
+  # sigma is everywhere in physics. Measured, not assumed.
+  # Single-quoted YAML: backslashes are literal here, unlike double quotes.
+  - latex: '\sigma = \frac{\hbar}{2} \tanh(\frac{\beta}{2})'
+    parses: true
+
+  - latex: '\sigma_x = 1'
+    parses: true
+
+  - latex: '\sigma_{eff} = \sigma_x + \sigma_y'
+    parses: true
+
+  # --- subscripted symbols that need placeholder folding -----------------
+  - latex: '\Omega_R = 2 g \sqrt{n+1}'
+    parses: true
+
+  - latex: '\Delta_c = \omega_c - \omega_a'
+    parses: true
+
+  - latex: '\Gamma_{tot} = \Gamma_1 + \Gamma_2'
+    parses: true

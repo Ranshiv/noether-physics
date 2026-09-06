@@ -1,0 +1,12 @@
+{
+  "detail": "",
+  "failures": [],
+  "gate": "equations",
+  "measured": true,
+  "measured_at": "2026-09-06T21:16:06+00:00",
+  "noether_version": "0.1.0",
+  "passed": 31,
+  "threshold": 0.9,
+  "total": 31,
+  "value": 1.0
+}

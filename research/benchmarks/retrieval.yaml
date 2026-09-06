@@ -1,0 +1,62 @@
+# Retrieval benchmark -- acceptance gate 1.
+#
+# Each question names the one paper in the corpus that answers it. The question
+# is phrased the way a physicist would ask it, NOT by copying the paper's title:
+# scoring a retriever against text lifted from the document is circular and
+# flatters the result.
+#
+# Several questions deliberately avoid the paper's own distinctive vocabulary, to
+# test whether retrieval finds the right work by meaning rather than by keyword
+# overlap. Those are the ones the hashed-embedding backend is expected to find
+# hardest, and they are here precisely so that weakness is measured rather than
+# assumed away.
+#
+# Corpus: run `noether ingest` for each expect_paper before scoring.
+
+# top_k must stay small RELATIVE TO THE CORPUS. With 8 papers ingested, a
+# top_k of 10 returns every paper and the gate measures nothing -- it scored
+# a meaningless 100% before this was caught. Top-3 of 8 is a real test; raise
+# top_k only as the corpus grows.
+threshold: 0.80
+top_k: 3
+
+questions:
+  # --- direct: distinctive vocabulary present ---------------------------
+  - question: "How can a superconducting qubit be protected from Purcell decay while keeping its coupling tunable?"
+    expect_paper: "arXiv:1009.4470"
+
+  - question: "What is the current experimental upper bound on the neutron electric dipole moment?"
+    expect_paper: "arXiv:2001.11966"
+
+  - question: "How do heat and work currents behave in boundary-driven systems beyond the Lindblad master equation?"
+    expect_paper: "arXiv:2005.11755"
+
+  - question: "What happens to Rabi oscillations and entanglement in the anti-Jaynes-Cummings model?"
+    expect_paper: "arXiv:2101.07336"
+
+  - question: "Can molecules be used to interface superconducting qubits with single optical photons?"
+    expect_paper: "arXiv:1607.06271"
+
+  - question: "How is spatial charge sensitivity characterised in a multi-mode superconducting circuit?"
+    expect_paper: "arXiv:2108.02105"
+
+  - question: "How are supersymmetric hierarchies of Jaynes-Cummings Hamiltonians constructed with different detunings?"
+    expect_paper: "arXiv:2504.19943"
+
+  - question: "How can finite-energy grid states of a harmonic oscillator be stabilised?"
+    expect_paper: "arXiv:2604.13529"
+
+  # --- indirect: the paper's own words are avoided ----------------------
+  # These test meaning over keyword overlap and are the honest measure of the
+  # retrieval backend's real quality.
+  - question: "Which measurement constrains time-reversal symmetry violation using ultracold neutrons and Ramsey interferometry?"
+    expect_paper: "arXiv:2001.11966"
+
+  - question: "How does a two-level system exchange a single excitation with a cavity field, and what does that do to teleportation fidelity?"
+    expect_paper: "arXiv:2101.07336"
+
+  - question: "When does the standard weak-coupling open-system approximation fail to describe energy flow correctly?"
+    expect_paper: "arXiv:2005.11755"
+
+  - question: "How can spontaneous emission into a readout resonator be suppressed in circuit QED?"
+    expect_paper: "arXiv:1009.4470"
