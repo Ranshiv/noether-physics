@@ -1,0 +1,10 @@
+# Normalise line endings so the repo is identical on every platform.
+# Without this, a Windows checkout rewrites every file to CRLF and the next
+# contributor on Linux sees the whole tree as modified.
+* text=auto eol=lf
+
+# Binary assets git must not touch.
+*.png binary
+*.pdf binary
+*.tar.gz binary
+*.parquet binary
