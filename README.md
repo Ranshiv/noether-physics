@@ -14,6 +14,9 @@ pip install noether-physics
 noether explain decoherence
 ```
 
+> **On 0.1.0 or 0.1.1?** Upgrade. Those releases confirm fabricated references — the
+> specific failure this tool exists to prevent. See [CHANGELOG.md](CHANGELOG.md).
+
 ---
 
 ## Read this before you trust it
@@ -134,7 +137,7 @@ pip install "noether-physics[mcp]"       # + MCP server
 ```
 
 Python 3.12+. From source: `uv venv && uv pip install -e ".[dev,quantum,mcp]"`, then `uv run pytest`
-(287 tests, no network — cassettes default to replay and a miss is an error, not a live fallback).
+(288 tests, no network — cassettes default to replay and a miss is an error, not a live fallback).
 
 ## Terms
 
@@ -147,7 +150,7 @@ deterministically from code and data, and is tagged with which.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). Release history: [CHANGELOG.md](CHANGELOG.md).
 
 The name honours Emmy Noether. The PyPI distribution is `noether-physics` because `noether` belongs
 to an unrelated [physical-units library](https://github.com/yunruse/noether); the command is
